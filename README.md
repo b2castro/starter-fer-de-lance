@@ -267,6 +267,11 @@ temp_closure_1:
 
 ### Recommended TODO List
 
+- Move over code from past labs and/or lecture code to get the basics going.
+  There is intentionally less support code this time to put less structure on
+  how errors are reported, etc.  Feel free to start with code copied from past
+  labs; note that this assignment uses _pairs_ rather than _tuples_ – most of
+  the code for pairs was given along with lecture notes.
 - Implement ANF for `ELambda`.  Hint – it's quite similar to what needed to be
   done to ANF a declaration.
 - Implement the compilation of `CLambda` and `CApp`, ignoring stored variables.
