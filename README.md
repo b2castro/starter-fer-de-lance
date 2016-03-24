@@ -11,7 +11,7 @@ Fer-de-lance starts with the pairs compiler (not full tuples, just pairs) and
 has two significant syntactic changes.  First, it _removes_ the notion of
 function declarations as a separate step in the beginning of the program.
 Second, it _adds_ the notion of a `lambda` expression for defining anonymous
-functions.
+functions, and allows expressions rather than just strings in function position:
 
 ```
 type program = expr
@@ -19,11 +19,13 @@ type program = expr
 type expr =
     ...
   | ELambda of string list * expr
+  | EApp of expr * expr list
 
 
 type cexpr =
     ...
   | CLambda of string list * aexpr
+  | CApp of immexpr * immexpr list
 ```
 
 Parentheses are required around lambda expressions in FDL:
@@ -46,6 +48,16 @@ semantics.  This means that when a function is constructed, the program should
 store any variables that they reference that aren't part of the argument list,
 for use when the function is called.  This naturally matches the semantics of
 function values in languages like OCaml and Python.
+
+There are several updates to errors as a result of adding first-class functions:
+
+- There is no longer a well-formedness error for an arity mismatch.  It is a
+  runtime error.
+- The value in function position may not be a function (for example, a user may
+  erroneously apply a number), which should raise a (dynamic) error that
+  reports "non-function"
+- There should still be a (well-formedness) check for duplicate argument names,
+  but there is no longer a check for duplicate function declarations
 
 ## Implementation
 
@@ -133,17 +145,19 @@ You will write a function `freevars` that takes an `aexpr` and returns the set
 of free variables (as a list):
 
 ```
-let rec freevars (ae : aexpr) : (string list) = 
+let freevars (ae : aexpr) : (string list) = 
   ...
 ```
 
-This can be used when compiling `CLambda` to fetch the values from the
-surrounding environment, and store them on the heap.  In the example of heap
-layout above, the `freevars` function should return `["x", "y"]`, and that
-information can be used in conjunction with `env` to perform the necessary
-`mov` instructions.
+You may need to write one or more helper functions for `freevars`, that keep
+track of an environment.  Then `freevars` can be used when compiling `CLambda`
+to fetch the values from the surrounding environment, and store them on the
+heap.  In the example of heap layout above, the `freevars` function should
+return `["x", "y"]`, and that information can be used in conjunction with `env`
+to perform the necessary `mov` instructions.
 
-This means that the generated code for a `lambda` will look like it did [in
+This means that the generated code for a `lambda` will look much like it did
+[in
 class](https://github.swarthmore.edu/jpolitz1/cs75-s16-lectures/tree/master/09.2-mar-24),
 but with an extra step to move the stored variables:
 
@@ -249,8 +263,17 @@ temp_closure_1:
   ... and so on ...
 ```
 
+### Recommended TODO List
 
-
-
+- Implement ANF for `ELambda`.  Hint – it's quite similar to what needed to be
+  done to ANF a declaration.
+- Implement the compilation of `CLambda` and `CApp`, ignoring stored variables.
+  You'll deal with storing and checking the arity and code pointer, and
+  generating and jumping over the instructions for a function.  Test as you go.
+- Implement `freevars`, testing as you go.  You can test with the helper
+  `tfvs`, which takes a name, an expression string, and a list of identifiers,
+  and checks that `freevars` returns the same list of strings (in any order).
+- Implement storing and restoring of variables in the compilation of `CLambda`
+  and `CApp`
 
 
