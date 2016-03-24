@@ -115,10 +115,11 @@ and freevars e =
   []
 
 let rec acompile_step (s : cexpr) (si : int) (env : int envt) : instruction list =
+  (* TODO: fill this in yourself this time *)
   []
-  (* TODO: fill this in (use code from old assignments if you like) *)
 
 and acompile_expr (e : aexpr) (si : int) (env : int envt) : instruction list =
+  (* TODO: fill this in yourself this time *)
   []
 
 let rec find_one (l : 'a list) (elt : 'a) : bool =
@@ -134,6 +135,7 @@ let rec find_dup (l : 'a list) : 'a option =
       if find_one xs x then Some(x) else find_dup xs
 
 let rec well_formed_e (e : expr) (env : bool envt) =
+  (* TODO: fill this in yourself this time *)
   []
 
 let compile_to_string (prog : expr) =
