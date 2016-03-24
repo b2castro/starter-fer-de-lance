@@ -1,5 +1,7 @@
 # Fer-de-lance
 
+![A fer-de-lance](https://upload.wikimedia.org/wikipedia/commons/5/51/Bothrops_asper_-_Tortuguero1.jpg)
+
 Fer-de-lance, aka FDL, aka **F**unctions **D**efined by **L**ambdas, is an
 egg-eater-like language with anonymous, first-class functions.
 
