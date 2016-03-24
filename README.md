@@ -55,9 +55,9 @@ Functions are stored in memory with the following layout:
 
 
 ```
--------------------------------------------------------------------------
-| arity | code ptr | #vars | var1 | var2 | ... | varn | (maybe padding) |
--------------------------------------------------------------------------
+-----------------------------------------------------------------
+| arity | code ptr | var1 | var2 | ... | varn | (maybe padding) |
+-----------------------------------------------------------------
 ```
 
 For example, in this program:
@@ -72,20 +72,17 @@ f(5)
 The memory layout of the `lambda` would be:
 
 ```
-------------------------------------------------------
-|   1  | <address> |   2   |  20  |  24  | <padding> |
-------------------------------------------------------
+----------------------------------------------
+|   1  | <address> |  20  |  24  | <padding> |
+----------------------------------------------
 ```
 
 There is one argument (`z`), so `1` is stored for arity.  There are two free
-variables—`x` and `y`—so a `2` is stored for the number of variables.  Then
-the values are stored in contiguous addresses (`20` to represent 10 and `24` to
-represent 12).  Since all of this takes up an odd number (`5`) of words, an
-extra word is used for padding to ensure 8-byte alignment.  (If the function
-stored three variables instead of two, then the padding wouldn't be needed).
+variables—`x` and `y`—so the corresponding values are stored in contiguous
+addresses (`20` to represent 10 and `24` to represent 12).  (If the function
+stored three variables instead of two, then padding would be needed).
 
-
-Function _values_ are stored in variables and registers as the addres
+Function _values_ are stored in variables and registers as the address
 of the first word in the function's memory, but with an additional `5`
 (`101` in binary) added to the value to act as a tag.
 
@@ -157,8 +154,7 @@ temp_closure_1:
 after1:
   mov [esi], <arity>
   mov [esi + 4], temp_closure_1
-  mov [esi + 8], <number of variables>
-  mov [esi + 12], <var1>
+  mov [esi + 8], <var1>
   ... and so on for each variable to store
   mov eax, esi
   add eax, 5
@@ -204,8 +200,10 @@ temp_closure_1:
   <usual prelude>
   mov eax, <function value?>
 
-  mov [ebp - 8], [eax + 4]
-  mov [ebp - 12], [eax + 8]
+  mov ecx, [eax + 3]
+  mov [ebp - 8], ecx
+  mov ecx, [eax + 7]
+  mov [ebp - 12], ecx
   ... and so on ...
 ```
 
@@ -244,8 +242,10 @@ temp_closure_1:
   <usual prelude>
   mov eax, [ebp+8]
 
-  mov [ebp - 8], [eax + 4]
-  mov [ebp - 12], [eax + 8]
+  mov ecx, [eax + 3]
+  mov [ebp - 8], ecx
+  mov ecx, [eax + 7]
+  mov [ebp - 12], ecx
   ... and so on ...
 ```
 
