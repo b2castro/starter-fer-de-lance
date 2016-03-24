@@ -95,7 +95,7 @@ The value layout is now:
 0xWWWWWWW[www0] - Number
 0xFFFFFFF[1111] - True
 0x7FFFFFF[1111] - False
-0xWWWWWWW[w001] - Tuple
+0xWWWWWWW[w001] - Pair
 0xWWWWWWW[w101] - Function
 ```
 
@@ -188,10 +188,66 @@ The outline of work here is:
   that will look up all variables, whether stored, arguments, or let-bound, in
   the correct location
 
+The second and third points are straightforward applications of ideas we've
+seen already – copying appropriate values from the heap into the stack, and
+using the environment to make variable references look at the right locations
+on the stack.
+
+The first point requires a little more design work.  If we try to fill in the
+body of `temp_closure_1` above, we immediately run into the issue of where we
+should find the stored values in memory.  We'd like some way to, say, move the
+address of the function value into `eax` so we could start copying values onto
+the stack:
+
+```
+temp_closure_1:
+  <usual prelude>
+  mov eax, <function value?>
+
+  mov [ebp - 8], [eax + 4]
+  mov [ebp - 12], [eax + 8]
+  ... and so on ...
+```
+
+But how do we get access to the function value?  The list of instructions for
+`temp_closure_1` may be run for many different instantiations of the function,
+so they can't all look in the same place.
+
+To solve this, we are going to augment the _calling convention_ in Fer-de-lance
+to pass along the function value when calling a function.  That is, we will
+`push` one extra time after pushing all the arguments, and add on the function
+value itself from the caller.  So, for example, in call like:
+
+```
+f(4, 5)
+```
+
+We would generate code for the caller like:
+
+```
+mov eax, [ebp-4] ;; (or wherever the variable f happens to be)
+<code to check that eax is tagged 101, and has arity 2>
+push 8
+push 10
+push eax
+mov eax, [eax - 1] ;; the address of the code pointer for the function value
+call [eax]         ;; call the function
+add esp, 12        ;; since we pushed two arguments and the function value, adjust esp by 12
+```
+
+Now the function value is available on the stack, accessible just as an
+argument (e.g. with `[ebp+8]`), so we can use that in the prelude for restoration:
 
 
+```
+temp_closure_1:
+  <usual prelude>
+  mov eax, [ebp+8]
 
-
+  mov [ebp - 8], [eax + 4]
+  mov [ebp - 12], [eax + 8]
+  ... and so on ...
+```
 
 
 
