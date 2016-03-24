@@ -271,7 +271,9 @@ temp_closure_1:
   There is intentionally less support code this time to put less structure on
   how errors are reported, etc.  Feel free to start with code copied from past
   labs; note that this assignment uses _pairs_ rather than _tuples_ – most of
-  the code for pairs was given along with lecture notes.
+  the code for pairs was given along with lecture notes.  Note that the initial
+  state of the tests will not run even simple programs until you get things
+  started.
 - Implement ANF for `ELambda`.  Hint – it's quite similar to what needed to be
   done to ANF a declaration.
 - Implement the compilation of `CLambda` and `CApp`, ignoring stored variables.
