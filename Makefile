@@ -19,7 +19,7 @@ test: compile.ml runner.ml test.ml expr.ml instruction.ml parser.mly lexer.mll
 	mv test.native test
 
 output/%.run: output/%.o main.c
-	clang -Wl,-no_pie -mstackrealign -g -m32 -o $@ main.c $<
+	clang -mstackrealign -g -m32 -o $@ main.c $<
 
 output/%.o: output/%.s
 	nasm -f $(FORMAT) -o $@ $<

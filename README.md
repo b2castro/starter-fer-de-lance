@@ -245,7 +245,7 @@ push 8
 push 10
 push eax
 mov eax, [eax - 1] ;; the address of the code pointer for the function value
-call [eax]         ;; call the function
+call eax         ;; call the function
 add esp, 12        ;; since we pushed two arguments and the function value, adjust esp by 12
 ```
 
